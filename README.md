@@ -1,4 +1,4 @@
-# Setup docker in your server using
+# Setup BLOCX-Node in your server using
 
 ## Step : 1
 
