@@ -20,13 +20,17 @@ error() {
     echo -e "${RED}[ERROR]${RESET} $1" >&2
 }
 
+# Install jq early
+log "Installing jq..."
+sudo apt-get update && sudo apt-get install -y jq
+
 # Update system
 log "Updating package lists..."
 sudo apt update && sudo apt upgrade -y
 
 # Install dependencies
 log "Installing required packages..."
-sudo apt install -y git jq ca-certificates curl
+sudo apt install -y git ca-certificates curl
 
 # Add Docker GPG key
 log "Adding Docker GPG key..."
