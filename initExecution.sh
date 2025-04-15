@@ -156,6 +156,7 @@ start_node() {
         run_command $COMPOSE_CMD -f compose.yaml up -d
     fi
 
+    log "Node started successfully."
 }
 
 # ================================
