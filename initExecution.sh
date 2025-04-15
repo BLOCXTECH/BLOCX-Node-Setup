@@ -147,12 +147,15 @@ start_node() {
 
     log "Starting $COMPOSE_CMD..."
     # Check the user input
-    if [[ "$VALIDATOR_NODE" == "Y" || "$VALIDATOR_NODE" == "y" ]]; then
-        $COMPOSE_CMD -f compose-validator.yaml up -d
+
+    VALIDATOR_NODE=$(echo "$VALIDATOR_NODE" | tr -d '[:space:]' | tr '[:upper:]' '[:lower:]')
+
+    if [[ "$VALIDATOR_NODE" == "y" ]]; then
+        run_command $COMPOSE_CMD -f compose-validator.yaml up -d
     else
-        $COMPOSE_CMD -f compose.yaml up -d
+        run_command $COMPOSE_CMD -f compose.yaml up -d
     fi
-    log "Node started successfully."
+
 }
 
 # ================================
