@@ -49,4 +49,4 @@ export FEE_RECIPIENT=0xYourEthereumAddress
 ./initExecution.sh
 ```
 
-- Now to deposit the amount for creating validator go to the staking launchpad at [Launchpad](http://149.102.152.164:3000/) and proceed with all the instructions.
+- Now to deposit the amount for creating validator go to the staking launchpad at [Launchpad](https://launchpad.blocxscan.com) and proceed with all the instructions.
