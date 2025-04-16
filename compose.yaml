@@ -98,39 +98,4 @@ services:
     logging: 
       options:
         max-size: "100m"
-        max-file: "2" 
-
-  validator:
-    image: blocxtech/lighthouse:v1.0.0
-    command:
-      - lighthouse
-      - validator_client
-      - --debug-level=info
-      - --testnet-dir=/el-cl-genesis-data/custom_config_data
-      - --validators-dir=/validator_keys
-      - --secrets-dir=/validator_keys_secrets
-      - --http
-      - --http-address=0.0.0.0
-      - --http-port=5062
-      - --unencrypted-http-transport
-      - --init-slashing-protection
-      - --beacon-nodes=http://beacon:5052
-      - --suggested-fee-recipient=${FEE_RECIPIENT}
-      - --metrics
-      - --metrics-address=0.0.0.0
-      - --metrics-allow-origin=*
-      - --metrics-port=5064
-    volumes:
-      - ./el-cl-genesis-data:/el-cl-genesis-data
-      - ./keys/validator_keys:/validator_keys
-      - ./keys/validator_keys_secrets:/validator_keys_secrets
-    ports:
-      - "5062:5062"
-      - "5064:5064"
-    depends_on:
-      - beacon
-    restart: unless-stopped
-    logging:
-      options:
-        max-size: "100m"
         max-file: "2"
