@@ -52,7 +52,7 @@ services:
         max-file: "2" # Set maximum number of log files
 
   beacon:
-    image: blocxtech/lighthouse:v1.0.0 
+    image: blocxtech/lighthouse:v1.0.1
     command:
       - lighthouse
       - beacon_node
