@@ -13,7 +13,7 @@
 - Generate your keys
 
 ```bash
-./bin/blocx-deposit-cli --non_interactive --language English new-mnemonic
+./bin/blocx-deposit-cli new-mnemonic
 ```
 
 ## Step : 3
