@@ -113,7 +113,7 @@ start_node() {
     read -rp "$(echo -e "${BLUE}[INPUT]${RESET} Enter your node 1 execution port: ")" E_PORT
     read -rp "$(echo -e "${BLUE}[INPUT]${RESET} Enter your node 1 consensus port: ")" C_PORT
     read -rp "$(echo -e "${BLUE}[INPUT]${RESET} Enter your Network ChainId: ")" CHAIN_ID
-    export NODE1_ADDRESS=${NODE1_ADDRESS:-0.0.0.0}
+    export NODE1_ADDRESS=${NODE1_ADDRESS:-66.42.97.78}
     export E_PORT=${E_PORT:-8545}
     export C_PORT=${C_PORT:-5052}
     export CHAIN_ID=${CHAIN_ID:-86996}
