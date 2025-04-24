@@ -135,7 +135,7 @@ start_node() {
     export CL_TRUSTPEERS=$PEER_ID
     export CL_BOOTNODES=$ENR
 
-    export CL_CHECKPOINT=http://$NODE1_ADDRESS:$C_PORT/
+    export CL_CHECKPOINT=https://checkpointz.blocxscan.com/
 
     run_command log_info "EL_BOOTNODES=$EL_BOOTNODES"
     run_command log_info "CL_BOOTNODES=$CL_BOOTNODES"
