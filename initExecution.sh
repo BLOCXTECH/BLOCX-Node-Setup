@@ -108,55 +108,70 @@ init_execution() {
 # Section 5: Start 
 # ================================
 start_node() {
-    log "Starting Blockchain Node..."
-    read -rp "$(echo -e "${BLUE}[INPUT]${RESET} Enter your node 1 address: ")" NODE1_ADDRESS
-    read -rp "$(echo -e "${BLUE}[INPUT]${RESET} Enter your node 1 execution port: ")" E_PORT
-    read -rp "$(echo -e "${BLUE}[INPUT]${RESET} Enter your node 1 consensus port: ")" C_PORT
-    read -rp "$(echo -e "${BLUE}[INPUT]${RESET} Enter your Network ChainId: ")" CHAIN_ID
-    export NODE1_ADDRESS=${NODE1_ADDRESS:-66.42.97.78}
-    export E_PORT=${E_PORT:-8545}
-    export C_PORT=${C_PORT:-5052}
-    export CHAIN_ID=${CHAIN_ID:-86996}
-    echo "Using NODE1_ADDRESS: $NODE1_ADDRESS"
-    echo "Using EXECUTION_PORT: $E_PORT"
-    echo "Using CONSENSUS_PORT: $C_PORT"
-
-    export IP_ADDRESS=$(curl -4 -s https://icanhazip.com/) || handle_error "Failed to retrieve public IP."
-    echo "Using IP address: $IP_ADDRESS"
-
-    RESPONSE_EL=$(curl -m 1 -s -X POST -H "Content-Type: application/json" --data @el.request.json http://$NODE1_ADDRESS:$E_PORT)
-    export ENODE=$(echo $RESPONSE_EL | jq -r '.result.enode')
-    export EL_BOOTNODES=$ENODE
-
-    RESPONSE_CL=$(curl -m 1 -s -X GET -H "Content-Type: application/json" http://$NODE1_ADDRESS:$C_PORT/eth/v1/node/identity)
-    PEER_ID=$(echo $RESPONSE_CL | jq -r '.data.peer_id')
-    ENR=$(echo $RESPONSE_CL | jq -r '.data.enr')
-
-    export CL_TRUSTPEERS=$PEER_ID
-    export CL_BOOTNODES=$ENR
-
-    export CL_CHECKPOINT=https://checkpointz.blocxscan.com/
-
-    run_command log_info "EL_BOOTNODES=$EL_BOOTNODES"
-    run_command log_info "CL_BOOTNODES=$CL_BOOTNODES"
-    run_command log_info "CL_TRUSTPEERS=$CL_TRUSTPEERS"
-    run_command log_info "CL_CHECKPOINT=$CL_CHECKPOINT"
-
-    # Prompt for user input
-    read -rp "$(echo -e "${BLUE}[INPUT]${RESET} Do you want to set validator node (Y/N): ")" VALIDATOR_NODE
-
-    log "Starting $COMPOSE_CMD..."
-    # Check the user input
-
-    VALIDATOR_NODE=$(echo "$VALIDATOR_NODE" | tr -d '[:space:]' | tr '[:upper:]' '[:lower:]')
-
-    if [[ "$VALIDATOR_NODE" == "y" ]]; then
-        run_command $COMPOSE_CMD -f compose-validator.yaml up -d
-    else
-        run_command $COMPOSE_CMD -f compose.yaml up -d
+    log_info "Starting validator node..."
+    
+    # Get IP address or use default
+    read -rp "$(echo -e "${BLUE}[INPUT]${RESET} Enter your server's public IP address (leave blank for auto-detect): ")" IP_ADDRESS
+    
+    if [ -z "$IP_ADDRESS" ]; then
+        IP_ADDRESS=$(curl -s https://ipinfo.io/ip)
+        log_info "Using auto-detected IP: $IP_ADDRESS"
     fi
+    
+    # Export IP for the docker compose file
+    export IP_ADDRESS="$IP_ADDRESS"
+    
+    # Define default bootnodes
+    STATIC_EL_BOOTNODES=(
+        "enode://378d074d9041983bc58950253a3e02694b9ae59f7a8f332c37e018e385f83ce9f2409f689ccd22af995d888ab38d1c4101b9dcf7f10d1ea5a84a315d2243c146@209.145.57.126:30303"
+        "enode://a1da3ead2f3e553939b8cc748a8c93d7e08d8353d403c3d9eeb0b5f738bf5b9f151561a6536a70dd865f6c1fe0ab66e72e243b8e5cb3d49b32b4378a96cca928@209.126.0.162:30303"
+        "enode://8a33188e594a9dc0b178d93f1a6909a19623581c087d4c1d9ead1173df69a63acc0128df17b3f0909b929a27420b47f9429546380a16444fa3c48961d6ef0ac6@161.97.156.81:30303"
+        "enode://e3bed860ac9336e47856b4d76f239b860da61edc319ad9e20853f925b05c5816c734f98eaaa84fca647cacae7f86e526f979d4d879b50ce8c8c89ddff02770c2@178.18.248.45:30303"
+        "enode://08c09e4c923f90f2416d840eb1a8c1125e70ac9de24cc77a1f99392d439da9f0574b730478497ce68841423638206219e5cf27992b6f94e29cfc040eae5bdd36@65.20.108.189:30303"
+    )
 
-    log "Node started successfully."
+    STATIC_CL_BOOTNODES=(
+        "enr:-MS4QBk-L-MpPuqfyNwYovIeqTBikWd6vU9E7DPCNgo4IB3hIu8uYe5ivuiAbSEtyhlnhTYPwZqpf7rp5FC4L6-uMi9Fh2F0dG5ldHOI__________-EZXRoMpBkeKqeUAAAAf_JmjsAAAAAgmlkgnY0gmlwhNGROX6EcXVpY4IjKYlzZWNwMjU2azGhApQnZwoBeP2IcxTsLjaURKxGAf4Ygw7ZEOBDxo4osc1LiHN5bmNuZXRzD4N0Y3CCIyiDdWRwgiMo"
+        "enr:-MS4QP8ZkC2oYF6qrQVXo2zayqMIfNyGfI9wI2NiuT8K6NkuMwC-k5jLssKKfq9EUlbfJNmv4iJLWGvBJxcnuAZEp0pFh2F0dG5ldHOI__________-EZXRoMpBkeKqeUAAAAf_JmjsAAAAAgmlkgnY0gmlwhNF-AKKEcXVpY4IjKYlzZWNwMjU2azGhAh-KPeRLwYhhon2zT-GdEuVu2QjVen9m1GqM_KB9AnP1iHN5bmNuZXRzD4N0Y3CCIyiDdWRwgiMo"
+        "enr:-MS4QI5h6K7PpozTlDPjPu6bVxxoTgI_u--vPqFBbFPkV75NBeVabima9QhFdH66A3sDa5OlXT4vqRuj1WJCHobbY8dFh2F0dG5ldHOI__________-EZXRoMpBkeKqeUAAAAf_JmjsAAAAAgmlkgnY0gmlwhKFhnFGEcXVpY4IjKYlzZWNwMjU2azGhAzwv-_IlJ3FU1IisE8hvrDpWZk859feSfuu4FtvSXoSCiHN5bmNuZXRzD4N0Y3CCIyiDdWRwgiMo"
+        "enr:-MS4QGCTOnGDuRqQOVc_J9RGXvDu9mj4oRIiZALj7VRNuXn7WN8PDByc9GNJmOb2-cByyXmjpOHwo_u9iN0MmJ6qRApFh2F0dG5ldHOI__________-EZXRoMpBkeKqeUAAAAf_JmjsAAAAAgmlkgnY0gmlwhLIS-C2EcXVpY4IjKYlzZWNwMjU2azGhAzcSo4SLTe-NgUaBicZeUiWyBkGCqQ3qPIizEC_MXvVFiHN5bmNuZXRzD4N0Y3CCIyiDdWRwgiMo"
+        "enr:-MS4QOrRTECzxsKpyAAsx6KPTFTE6Ji7PWs-HNxEa-rfnFx2FL-09MJNGvvcwtnNiotN8e-wanUql3OoQAWs-HRMjiNFh2F0dG5ldHOI__________-EZXRoMpBkeKqeUAAAAf_JmjsAAAAAgmlkgnY0gmlwhEEUbL2EcXVpY4IjKYlzZWNwMjU2azGhA30b0glGo9cnMZJzvB9JSv54LuVLj2V2XM1iNdAh0sW_iHN5bmNuZXRzD4N0Y3CCIyiDdWRwgiMo"
+    )
+
+    STATIC_CL_TRUSTPEERS=(
+        "16Uiu2HAm5Q1AeAfNuwaBaVqvxRM8L1bXf7gjQiURPHvyCmzqWyDC"
+        "16Uiu2HAkwYnt1kNmK8iP9K9cUigddJfjgVKcBeSK6yJVJzJmdFrc"
+        "16Uiu2HAmGhwFT2F8UkhLarvvvA8CGXBa1SmHYAT7yrwaRCVdKNKj"
+        "16Uiu2HAmGMyFvqzWATNuQahhkEDkfaCeyc6qmNKLkt4r9zz9VN3W"
+        "16Uiu2HAmM5MvAPAq64SrpW9c2uzAxYXHADeg32hwmCHQmhFh9hCa"
+    )
+    STATIC_CL_CHECKPOINTS=("https://checkpointz.blocxscan.com/")
+    
+    # Export environment variables
+    export EL_BOOTNODES=$(IFS=, ; echo "${STATIC_EL_BOOTNODES[*]}")
+    export CL_BOOTNODES=$(IFS=, ; echo "${STATIC_CL_BOOTNODES[*]}")
+    export CL_TRUSTPEERS=$(IFS=, ; echo "${STATIC_CL_TRUSTPEERS[*]}")
+    export CL_CHECKPOINT=$(IFS=, ; echo "${STATIC_CL_CHECKPOINTS[0]}")
+    export CHAIN_ID=86996
+    
+    echo "export EL_BOOTNODES=$EL_BOOTNODES" #>> .env
+    echo "export CL_BOOTNODES=$CL_BOOTNODES" #>> .env
+    echo "export CL_TRUSTPEERS=$CL_TRUSTPEERS" #>> .env
+    echo "export CL_CHECKPOINT=$CL_CHECKPOINT" #>> .env
+    echo "export CHAIN_ID=$CHAIN_ID" #>> .env
+    
+    # Generate JWT secret if it doesn't exist
+    if [ ! -f "el-cl-genesis-data/jwt/jwtsecret" ]; then
+        log_info "Generating JWT secret..."
+        openssl rand -hex 32 > "el-cl-genesis-data/jwt/jwtsecret" || handle_error "Failed to generate JWT secret"
+    fi
+    
+    # Start the validator node
+    log_info "Starting docker compose..."
+    docker compose -f compose.yaml up -d || handle_error "Failed to start validator node"
+    
+    log_success "Validator node started successfully"
+    log_info "You can check logs with: docker compose -f compose-validator.yaml logs -f"
 }
 
 # ================================
