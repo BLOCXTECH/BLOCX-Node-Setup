@@ -43,13 +43,13 @@ services:
       - "30303:30303/tcp"
       - "30303:30303/udp"
     restart: unless-stopped
-    logging: 
+    logging:
       options:
         max-size: "100m" # Set maximum log file size
         max-file: "2" # Set maximum number of log files
 
   beacon:
-    image: blocxtech/lighthouse:v1.0.2
+    image: blocxtech/lighthouse:v1.0.3
     command:
       - lighthouse
       - beacon_node
@@ -92,7 +92,7 @@ services:
     depends_on:
       - execution
     restart: unless-stopped
-    logging: 
+    logging:
       options:
         max-size: "100m"
         max-file: "2"
