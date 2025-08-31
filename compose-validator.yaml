@@ -49,7 +49,7 @@ services:
         max-file: "2" # Set maximum number of log files
 
   beacon:
-    image: blocxtech/lighthouse:v1.0.3
+    image: blocxtech/lighthouse:v1.0.4
     command:
       - lighthouse
       - beacon_node
@@ -98,7 +98,7 @@ services:
         max-file: "2" 
 
   validator:
-    image: blocxtech/lighthouse:v1.0.3
+    image: blocxtech/lighthouse:v1.0.4
     command:
       - lighthouse
       - validator_client
