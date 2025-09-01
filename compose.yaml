@@ -56,6 +56,10 @@ services:
       - --debug-level=info
       - --datadir=/consensus-data
       - --testnet-dir=/el-cl-genesis-data/custom_config_data
+      # HARD FORK FLAGS
+      - --checkpoint-state=/checkpoint/checkpoint_state_119212.ssz
+      - --checkpoint-block=/checkpoint/checkpoint_block_119212.ssz
+      - --purge-db  # TO FORCE CHECKPOINT SYNC OR DELETE CONSENSUS-DATA FOLDER
       - --enr-address=${IP_ADDRESS}
       - --enr-udp-port=9000
       - --enr-tcp-port=9000
@@ -79,10 +83,11 @@ services:
       - --disable-peer-scoring
       - --trusted-peers=${CL_TRUSTPEERS}
       - --boot-nodes=${CL_BOOTNODES}
-      - --checkpoint-sync-url=${CL_CHECKPOINT}
+      # - --checkpoint-sync-url=${CL_CHECKPOINT} # DISABLED FOR HARD FORK
     volumes:
       - ./consensus-data:/consensus-data
       - ./el-cl-genesis-data:/el-cl-genesis-data
+      - ./checkpoint_states:/checkpoint
     ports:
       - "9002:9000/tcp"
       - "9003:9000/udp"
