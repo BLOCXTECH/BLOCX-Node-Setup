@@ -57,8 +57,8 @@ services:
       - --datadir=/consensus-data
       - --testnet-dir=/el-cl-genesis-data/custom_config_data
       # HARD FORK FLAGS
-      - --checkpoint-state=/checkpoint/checkpoint_state_119012.ssz
-      - --checkpoint-block=/checkpoint/checkpoint_block_119012.ssz
+      - --checkpoint-state=/checkpoint/checkpoint_state_3808320.ssz
+      - --checkpoint-block=/checkpoint/checkpoint_block_3808320.ssz
       - --purge-db  # TO FORCE CHECKPOINT SYNC OR DELETE CONSENSUS-DATA FOLDER
       - --enr-address=${IP_ADDRESS}
       - --enr-udp-port=9000
