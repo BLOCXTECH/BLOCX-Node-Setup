@@ -111,7 +111,7 @@ services:
       - --http-port=5062
       - --unencrypted-http-transport
       - --init-slashing-protection
-      - --beacon-nodes=http://beacon:5052
+      - --beacon-nodes=http://beacon:5052,http://89.117.60.7:5052,http://161.97.156.81:5052,http://89.117.59.14:5052,http://178.18.248.45:5052,http://65.20.108.189:5052,http://66.42.97.78:5052
       - --suggested-fee-recipient=${FEE_RECIPIENT}
       - --metrics
       - --metrics-address=0.0.0.0
